@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生日快乐 & 贪吃蛇游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial Rounded MT Bold', 'Segoe UI', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            color: #333;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 0;
+            position: relative;
+        }
+        
+        h1 {
+            font-size: 4rem;
+            color: #ff4081;
+            text-shadow: 3px 3px 0 #ffeb3b, 6px 6px 0 rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+        
+        .birthday-message {
+            font-size: 1.5rem;
+            color: #7b1fa2;
+            margin-bottom: 30px;
+            background: rgba(255,255,255,0.7);
+            padding: 15px;
+            border-radius: 50px;
+            display: inline-block;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .balloons {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        
+        .balloon {
+            width: 60px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 15px;
+            position: relative;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .balloon:before {
+            content: "";
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 30px;
+            background: #333;
+        }
+        
+        .balloon:nth-child(1) {
+            background: #ff4081;
+            animation-delay: 0s;
+        }
+        
+        .balloon:nth-child(2) {
+            background: #ffeb3b;
+            animation-delay: 0.5s;
+        }
+        
+        .balloon:nth-child(3) {
+            background: #4caf50;
+            animation-delay: 1s;
+        }
+        
+        .balloon:nth-child(4) {
+            background: #2196f3;
+            animation-delay: 1.5s;
+        }
+        
+        .balloon:nth-child(5) {
+            background: #9c27b0;
+            animation-delay: 2s;
+        }
+        
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .game-section {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .game-title {
+            text-align: center;
+            color: #ff4081;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+        
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        #gameCanvas {
+            border: 3px solid #ff4081;
+            border-radius: 10px;
+            background: #f5f5f5;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            width: 400px;
+            margin-top: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .game-controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        button {
+            background: #ff4081;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 0 #d81b60;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 0 #d81b60;
+        }
+        
+        button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #d81b60;
+        }
+        
+        .instructions {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .instructions h2 {
+            color: #ff4081;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .birthday-wish {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.8);
+            border-radius: 15px;
+            font-size: 1.3rem;
+            color: #7b1fa2;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .cake {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        
+        .cake-piece {
+            width: 40px;
+            height: 20px;
+            background: #ff9800;
+            margin: 0 5px;
+            border-radius: 5px 5px 0 0;
+            position: relative;
+            animation: glow 2s infinite alternate;
+        }
+        
+        .cake-piece:nth-child(2) {
+            background: #ff5722;
+            animation-delay: 0.2s;
+        }
+        
+        .cake-piece:nth-child(3) {
+            background: #e91e63;
+            animation-delay: 0.4s;
+        }
+        
+        .cake-piece:nth-child(4) {
+            background: #9c27b0;
+            animation-delay: 0.6s;
+        }
+        
+        .cake-piece:nth-child(5) {
+            background: #673ab7;
+            animation-delay: 0.8s;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px #ff9800; }
+            100% { box-shadow: 0 0 20px #ff9800; }
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .birthday-message {
+                font-size: 1.2rem;
+            }
+            
+            .content {
+                flex-direction: column;
+            }
+            
+            .game-info {
+                width: 100%;
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>生日快乐！</h1>
+            <div class="birthday-message">愿你的每一天都充满快乐和惊喜！</div>
+            
+            <div class="balloons">
+                <div class="balloon"></div>
+                <div class="balloon"></div>
+                <div class="balloon"></div>
+                <div class="balloon"></div>
+                <div class="balloon"></div>
+            </div>
+            
+            <div class="cake">
+                <div class="cake-piece"></div>
+                <div class="cake-piece"></div>
+                <div class="cake-piece"></div>
+                <div class="cake-piece"></div>
+                <div class="cake-piece"></div>
+            </div>
+        </header>
+        
+        <div class="content">
+            <div class="game-section">
+                <h2 class="game-title">贪吃蛇小游戏</h2>
+                <div class="game-container">
+                    <canvas id="gameCanvas" width="400" height="400"></canvas>
+                    <div class="game-info">
+                        <div>得分: <span id="score">0</span></div>
+                        <div>最高分: <span id="highScore">0</span></div>
+                    </div>
+                    <div class="game-controls">
+                        <button id="startBtn">开始游戏</button>
+                        <button id="pauseBtn">暂停</button>
+                        <button id="resetBtn">重新开始</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="instructions">
+                <h2>游戏说明</h2>
+                <ul>
+                    <li>使用键盘方向键(↑, ↓, ←, →)控制蛇的移动方向</li>
+                    <li>蛇需要吃掉红色食物来增长身体和增加分数</li>
+                    <li>注意不要撞到墙壁或自己的身体，否则游戏结束</li>
+                    <li>每吃一个食物得10分</li>
+                    <li>随着分数增加，蛇的移动速度会逐渐加快</li>
+                </ul>
+                
+                <h2>生日祝福</h2>
+                <p>在这个特别的日子里，祝你生日快乐！愿这个小小的贪吃蛇游戏带给你一些欢乐。希望你的生日充满欢笑、爱和美好的回忆！</p >
+                
+                <div class="birthday-wish">
+                    🎂 愿你的未来像贪吃蛇一样，不断成长，收获满满！ 🎂
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 贪吃蛇游戏代码
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+        const highScoreElement = document.getElementById('highScore');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        
+        // 游戏变量
+        const gridSize = 20;
+        const tileCount = canvas.width / gridSize;
+        
+        let snake = [
+            {x: 10, y: 10}
+        ];
+        let food = {};
+        let dx = 0;
+        let dy = 0;
+        let score = 0;
+        let highScore = localStorage.getItem('snakeHighScore') || 0;
+        let gameSpeed = 150;
+        let gameRunning = false;
+        let gameLoop;
+        
+        // 初始化游戏
+        function initGame() {
+            snake = [{x: 10, y: 10}];
+            generateFood();
+            dx = 0;
+            dy = 0;
+            score = 0;
+            gameSpeed = 150;
+            updateScore();
+            highScoreElement.textContent = highScore;
+        }
+        
+        // 生成食物
+        function generateFood() {
+            food = {
+                x: Math.floor(Math.random() * tileCount),
+                y: Math.floor(Math.random() * tileCount)
+            };
+            
+            // 确保食物不会生成在蛇身上
+            for (let segment of snake) {
+                if (segment.x === food.x && segment.y === food.y) {
+                    generateFood();
+                    return;
+                }
+            }
+        }
+        
+        // 绘制游戏
+        function drawGame() {
+            // 清空画布
+            ctx.fillStyle = '#f5f5f5';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘制蛇
+            ctx.fillStyle = '#4caf50';
+            for (let segment of snake) {
+                ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize - 2, gridSize - 2);
+            }
+            
+            // 绘制蛇头
+            ctx.fillStyle = '#2e7d32';
+            ctx.fillRect(snake[0].x * gridSize, snake[0].y * gridSize, gridSize - 2, gridSize - 2);
+            
+            // 绘制食物
+            ctx.fillStyle = '#ff4081';
+            ctx.beginPath();
+            ctx.arc(
+                food.x * gridSize + gridSize/2, 
+                food.y * gridSize + gridSize/2, 
+                gridSize/2 - 2, 
+                0, 
+                Math.PI * 2
+            );
+            ctx.fill();
+        }
+        
+        // 更新游戏状态
+        function updateGame() {
+            // 移动蛇
+            const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+            snake.unshift(head);
+            
+            // 检查是否吃到食物
+            if (head.x === food.x && head.y === food.y) {
+                score += 10;
+                updateScore();
+                generateFood();
+                
+                // 增加速度
+                if (gameSpeed > 50) {
+                    gameSpeed -= 2;
+                }
+            } else {
+                snake.pop();
+            }
+            
+            // 检查游戏结束条件
+            if (
+                head.x < 0 || 
+                head.x >= tileCount || 
+                head.y < 0 || 
+                head.y >= tileCount ||
+                checkCollision()
+            ) {
+                gameOver();
+                return;
+            }
+            
+            drawGame();
+        }
+        
+        // 检查碰撞
+        function checkCollision() {
+            const head = snake[0];
+            for (let i = 1; i < snake.length; i++) {
+                if (head.x === snake[i].x && head.y === snake[i].y) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        // 更新分数
+        function updateScore() {
+            scoreElement.textContent = score;
+            if (score > highScore) {
+                highScore = score;
+                highScoreElement.textContent = highScore;
+                localStorage.setItem('snakeHighScore', highScore);
+            }
+        }
+        
+        // 游戏结束
+        function gameOver() {
+            gameRunning = false;
+            clearInterval(gameLoop);
+            alert(`游戏结束！你的得分是: ${score}`);
+        }
+        
+        // 开始游戏
+        function startGame() {
+            if (!gameRunning) {
+                gameRunning = true;
+                gameLoop = setInterval(updateGame, gameSpeed);
+            }
+        }
+        
+        // 暂停游戏
+        function pauseGame() {
+            if (gameRunning) {
+                gameRunning = false;
+                clearInterval(gameLoop);
+            } else {
+                startGame();
+            }
+        }
+        
+        // 重新开始游戏
+        function resetGame() {
+            clearInterval(gameLoop);
+            gameRunning = false;
+            initGame();
+            drawGame();
+        }
+        
+        // 键盘控制
+        document.addEventListener('keydown', (e) => {
+            // 防止方向键滚动页面
+            if([37, 38, 39, 40].includes(e.keyCode)) {
+                e.preventDefault();
+            }
+            
+            // 左键
+            if (e.keyCode === 37 && dx === 0) {
+                dx = -1;
+                dy = 0;
+            }
+            // 上键
+            else if (e.keyCode === 38 && dy === 0) {
+                dx = 0;
+                dy = -1;
+            }
+            // 右键
+            else if (e.keyCode === 39 && dx === 0) {
+                dx = 1;
+                dy = 0;
+            }
+            // 下键
+            else if (e.keyCode === 40 && dy === 0) {
+                dx = 0;
+                dy = 1;
+            }
+        });
+        
+        // 按钮事件
+        startBtn.addEventListener('click', startGame);
+        pauseBtn.addEventListener('click', pauseGame);
+        resetBtn.addEventListener('click', resetGame);
+        
+        // 初始化游戏
+        initGame();
+        drawGame();
+    </script>
+</body>
+</html>
